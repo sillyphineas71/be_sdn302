@@ -1,17 +1,5 @@
 const mongoose = require("mongoose");
 
-const AddressSchema = new mongoose.Schema(
-  {
-    fullName: String,
-    phone: String,
-    line1: String,
-    ward: String,
-    district: String,
-    city: String,
-    country: String,
-  },
-  { _id: false }
-);
 
 const AmountsSchema = new mongoose.Schema(
   {
@@ -30,7 +18,6 @@ const OrderSchema = new mongoose.Schema(
     code: { type: String, required: true },
     userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
     status: { type: String, default: "pending" },
-    address: AddressSchema,
     amounts: AmountsSchema,
     notes: { type: String },
     paymentId: {
