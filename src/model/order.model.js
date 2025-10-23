@@ -30,7 +30,6 @@ const OrderSchema = new mongoose.Schema(
     code: { type: String, required: true },
     userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
     status: { type: String, default: "pending" },
-    address: AddressSchema,
     amounts: AmountsSchema,
     notes: { type: String },
     paymentId: {
