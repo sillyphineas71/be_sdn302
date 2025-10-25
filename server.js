@@ -14,6 +14,8 @@ app.get("/", async (req, res) => {
 
 app.use("/api/auth", require("./src/routes/authRoutes"));
 app.use("/api/order", require("./src/routes/orderRoutes"));
-app.use('/api/users', require("./src/routes/userRoutes"));
+app.use("/api/users", require("./src/routes/userRoutes"));
+app.use("/api/food", require("./src/routes/foodRoutes"));
+
 const PORT = process.env.PORT || 9999;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
