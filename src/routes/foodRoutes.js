@@ -1,8 +1,9 @@
 //foodRoutes.js
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const { updateFood } = require('../controller/foodController.js');
+const foodController = require("../controller/foodController");
 
-router.put('/:id', updateFood);
+router.post("/add", foodController.createFood);
+router.put("/:id", foodControllerupdateFood);
 
 module.exports = router;
