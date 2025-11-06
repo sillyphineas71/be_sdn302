@@ -2,6 +2,7 @@ const express = require("express");
 const swaggerUi = require("swagger-ui-express");
 const swaggerSpec = require("./config/swagger");
 const connectDB = require("./config/db.js");
+const cors = require("cors");
 const app = express();
 
 app.use(express.json());
@@ -9,7 +10,7 @@ connectDB();
 
 // Swagger documentation
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
-
+app.use(cors());
 app.get("/", async (req, res) => {
   try {
     res.send({ message: "Welcome to BE_SDN API. View docs at /api-docs" });

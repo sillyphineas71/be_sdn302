@@ -241,24 +241,20 @@ module.exports.clearCart = async (req, res) => {
 // Checkout cart - create order from cart items and remove them (authenticated)
 // Body: { cartItemIds?, shipping?, discount?, tax?, notes?, paymentMethodCode? }
 module.exports.checkout = async (req, res) => {
-  const session = await mongoose.startSession();
-  session.startTransaction();
-
   try {
     const userId = req.userId; // From auth middleware
     const { cartItemIds, shipping, discount, tax, notes, paymentMethodCode } =
       req.body || {};
 
-    const cart = await Cart.findOne({ userId, status: "active" }).session(
-      session
-    );
+    // 1️⃣ Tìm giỏ hàng đang hoạt động
+    const cart = await Cart.findOne({ userId, status: "active" });
     if (!cart) {
-      await session.abortTransaction();
       return res
         .status(404)
         .json({ message: "No active cart found for this user" });
     }
 
+    // 2️⃣ Lấy danh sách item trong cart
     const cartItemQuery = { cartId: cart._id };
     if (Array.isArray(cartItemIds) && cartItemIds.length > 0) {
       cartItemQuery._id = {
@@ -266,15 +262,14 @@ module.exports.checkout = async (req, res) => {
       };
     }
 
-    const cartItems = await CartItem.find(cartItemQuery).session(session);
+    const cartItems = await CartItem.find(cartItemQuery);
     if (!cartItems || cartItems.length === 0) {
-      await session.abortTransaction();
       return res.status(400).json({ message: "No cart items to checkout" });
     }
 
+    // 3️⃣ Tính toán tổng tiền
     let subtotal = 0;
     const orderDetails = [];
-
     for (const item of cartItems) {
       subtotal += item.lineTotal;
       orderDetails.push({
@@ -296,90 +291,72 @@ module.exports.checkout = async (req, res) => {
     amounts.grandTotal =
       amounts.subtotal + amounts.shipping - amounts.discount + amounts.tax;
 
-    const order = await Order.create(
-      [
-        {
-          code: genOrderCode(),
-          userId,
-          status: "pending",
-          amounts,
-          notes: notes || undefined,
-        },
-      ],
-      { session }
-    );
+    // 4️⃣ Tạo đơn hàng
+    const order = await Order.create({
+      code: genOrderCode(),
+      userId,
+      status: "pending",
+      amounts,
+      notes: notes || undefined,
+    });
 
+    // 5️⃣ Tạo chi tiết đơn hàng
     await OrderDetail.insertMany(
-      orderDetails.map((d) => ({ ...d, orderId: order[0]._id })),
-      { session }
+      orderDetails.map((d) => ({ ...d, orderId: order._id }))
     );
 
+    // 6️⃣ Xử lý thanh toán (nếu có)
     let payment = null;
     if (paymentMethodCode) {
       const pm = await PaymentMethod.findOne({
         code: paymentMethodCode.toUpperCase(),
-      }).session(session);
+      });
 
       if (!pm) {
-        await session.abortTransaction();
         return res.status(400).json({ message: "Invalid payment method" });
       }
 
-      payment = await Payment.create(
-        [
-          {
-            orderId: order[0]._id,
-            methodId: pm._id,
-            methodSnapshot: { code: pm.code, name: pm.name },
-            amount: amounts.grandTotal,
-            currency: amounts.currency,
-            status: "pending",
-          },
-        ],
-        { session }
-      );
+      payment = await Payment.create({
+        orderId: order._id,
+        methodId: pm._id,
+        methodSnapshot: { code: pm.code, name: pm.name },
+        amount: amounts.grandTotal,
+        currency: amounts.currency,
+        status: "pending",
+      });
 
       await Order.updateOne(
-        { _id: order[0]._id },
-        { $set: { paymentId: payment[0]._id } },
-        { session }
+        { _id: order._id },
+        { $set: { paymentId: payment._id } }
       );
     }
 
-    await CartItem.deleteMany(
-      { _id: { $in: cartItems.map((item) => item._id) } },
-      { session }
-    );
+    // 7️⃣ Xóa cart items sau khi checkout
+    await CartItem.deleteMany({ _id: { $in: cartItems.map((i) => i._id) } });
 
-    const remainingItems = await CartItem.countDocuments({
-      cartId: cart._id,
-    }).session(session);
+    // 8️⃣ Cập nhật trạng thái giỏ hàng
+    const remainingItems = await CartItem.countDocuments({ cartId: cart._id });
     if (remainingItems === 0) {
       await Cart.updateOne(
         { _id: cart._id },
-        { $set: { status: "converted", updatedAt: new Date() } },
-        { session }
+        { $set: { status: "converted", updatedAt: new Date() } }
       );
     }
 
-    await session.commitTransaction();
-
+    // ✅ Hoàn tất
     return res.status(201).json({
       message: "Order created from cart",
       order: {
-        id: order[0]._id,
-        code: order[0].code,
-        status: order[0].status,
+        id: order._id,
+        code: order.code,
+        status: order.status,
         amounts,
         items: orderDetails.length,
-        paymentId: payment?.[0]?._id || null,
+        paymentId: payment?._id || null,
       },
       cartItemsProcessed: cartItems.length,
     });
   } catch (err) {
-    await session.abortTransaction();
     return res.status(500).json({ message: err.message || "Checkout failed" });
-  } finally {
-    session.endSession();
   }
 };
