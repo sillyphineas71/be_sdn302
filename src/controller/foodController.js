@@ -2,7 +2,8 @@
 const Food = require("../model/food.model");
 const Category = require("../model/category.model");
 
-// GET /api/food/featured
+// --- 1. GET /api/food/featured ---
+// Hàm này vẫn giữ nguyên, lọc theo tags cố định "featured" hoặc "popular"
 const getFeaturedFoods = async (req, res) => {
   try {
     const { limit } = req.query;
@@ -10,7 +11,8 @@ const getFeaturedFoods = async (req, res) => {
 
     const featured = await Food.find({
       inStock: true,
-      $or: [{ tags: "featured" }, { tags: "popular" }],
+      // 💡 Lọc cố định: tags chứa "featured" HOẶC "popular"
+      tags: { $in: ["featured", "popular", "pizza", "sweet", "cheese", "italian"] },
     })
       .sort({ createdAt: -1 })
       .limit(take)
@@ -29,7 +31,8 @@ const getFeaturedFoods = async (req, res) => {
   }
 };
 
-// GET /api/food
+// --- 2. GET /api/food ---
+// Đã thêm logic lọc linh hoạt theo tagsFilter
 const listFoods = async (req, res) => {
   try {
     const {
@@ -39,6 +42,7 @@ const listFoods = async (req, res) => {
       search,
       inStock,
       sort, // price_asc | price_desc | newest
+      tagsFilter, // THÊM: Lọc theo tags (ví dụ: spicy,sweet)
     } = req.query;
 
     const pageNum = Math.max(parseInt(page, 10), 1);
@@ -49,11 +53,24 @@ const listFoods = async (req, res) => {
     if (typeof inStock !== "undefined") {
       filters.inStock = inStock === "true";
     }
+
+    // LỌC THEO TÌM KIẾM
     if (search) {
       filters.$or = [
         { name: { $regex: search, $options: "i" } },
+        // Lọc tags khớp với chuỗi search
         { tags: { $elemMatch: { $regex: search, $options: "i" } } },
       ];
+    }
+
+    // 🎯 LỌC THEO TAGS FILTER (Ưu tiên tagsFilter hơn search nếu tagsFilter được cung cấp)
+    if (tagsFilter) {
+      const tagArray = tagsFilter.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0);
+
+      if (tagArray.length > 0) {
+        // Sản phẩm phải có ÍT NHẤT MỘT tag trong danh sách cung cấp
+        filters.tags = { $in: tagArray };
+      }
     }
 
     const sortMap = {
@@ -91,16 +108,19 @@ const listFoods = async (req, res) => {
   }
 };
 
-// GET /api/food/:idOrSlug
+// --- 3. GET /api/food/:idOrSlug ---
+// Giữ nguyên
 const getFoodByIdOrSlug = async (req, res) => {
   try {
     const { idOrSlug } = req.params;
-    const query =
-      idOrSlug.match(/^[0-9a-fA-F]{24}$/) != null
-        ? { _id: idOrSlug }
-        : { slug: idOrSlug };
+
+    // Kiểm tra xem params có phải là MongoDB ID hợp lệ không
+    const isMongoId = idOrSlug.match(/^[0-9a-fA-F]{24}$/) != null;
+
+    const query = isMongoId ? { _id: idOrSlug } : { slug: idOrSlug };
 
     const item = await Food.findOne(query).lean();
+
     if (!item) {
       return res.status(404).json({
         success: false,

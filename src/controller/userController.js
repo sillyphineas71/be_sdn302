@@ -1,71 +1,71 @@
 const User = require('../model/user.model.js');
 
-const getProfile = async (req, res) => {
-  try {
-    const { userId } = req.user || {};
-    if (!userId) {
-      return res.status(401).json({ message: 'Unauthorized' });
-    }
+// const getProfile = async (req, res) => {
+//   try {
+//     const { userId } = req.user || {};
+//     if (!userId) {
+//       return res.status(401).json({ message: 'Unauthorized' });
+//     }
 
-    const user = await User.findById(userId).lean();
-    if (!user) {
-      return res.status(404).json({ message: 'Không tìm thấy người dùng.' });
-    }
+//     const user = await User.findById(userId).lean();
+//     if (!user) {
+//       return res.status(404).json({ message: 'Không tìm thấy người dùng.' });
+//     }
 
-    return res.status(200).json({
-      message: 'Lấy thông tin người dùng thành công!',
-      user: {
-        id: user._id,
-        email: user.email,
-        fullName: user.fullName,
-        phone: user.phone,
-        addresses: user.addresses || [],
-        createdAt: user.createdAt,
-        updatedAt: user.updatedAt,
-      }
-    });
-  } catch (error) {
-    console.error('Lỗi khi lấy thông tin người dùng:', error);
-    return res.status(500).json({ message: 'Lỗi máy chủ nội bộ' });
-  }
-};
+//     return res.status(200).json({
+//       message: 'Lấy thông tin người dùng thành công!',
+//       user: {
+//         id: user._id,
+//         email: user.email,
+//         fullName: user.fullName,
+//         phone: user.phone,
+//         addresses: user.addresses || [],
+//         createdAt: user.createdAt,
+//         updatedAt: user.updatedAt,
+//       }
+//     });
+//   } catch (error) {
+//     console.error('Lỗi khi lấy thông tin người dùng:', error);
+//     return res.status(500).json({ message: 'Lỗi máy chủ nội bộ' });
+//   }
+// };
 
-const updateProfile = async (req, res) => {
-  try {
-    const { userId } = req.user || {};
-    if (!userId) {
-      return res.status(401).json({ message: 'Unauthorized' });
-    }
+// const updateProfile = async (req, res) => {
+//   try {
+//     const { userId } = req.user || {};
+//     if (!userId) {
+//       return res.status(401).json({ message: 'Unauthorized' });
+//     }
 
-    const { fullName, phone } = req.body;
+//     const { fullName, phone } = req.body;
 
-    const user = await User.findById(userId);
-    if (!user) {
-      return res.status(404).json({ message: 'Không tìm thấy người dùng.' });
-    }
+//     const user = await User.findById(userId);
+//     if (!user) {
+//       return res.status(404).json({ message: 'Không tìm thấy người dùng.' });
+//     }
 
-    if (typeof fullName !== 'undefined') user.fullName = fullName;
-    if (typeof phone !== 'undefined') user.phone = phone;
+//     if (typeof fullName !== 'undefined') user.fullName = fullName;
+//     if (typeof phone !== 'undefined') user.phone = phone;
 
-    const updated = await user.save();
+//     const updated = await user.save();
 
-    return res.status(200).json({
-      message: 'Cập nhật hồ sơ thành công!',
-      user: {
-        id: updated._id,
-        email: updated.email,
-        fullName: updated.fullName,
-        phone: updated.phone,
-        addresses: updated.addresses || [],
-        createdAt: updated.createdAt,
-        updatedAt: updated.updatedAt,
-      }
-    });
-  } catch (error) {
-    console.error('Lỗi khi cập nhật hồ sơ:', error);
-    return res.status(500).json({ message: 'Lỗi máy chủ nội bộ' });
-  }
-};
+//     return res.status(200).json({
+//       message: 'Cập nhật hồ sơ thành công!',
+//       user: {
+//         id: updated._id,
+//         email: updated.email,
+//         fullName: updated.fullName,
+//         phone: updated.phone,
+//         addresses: updated.addresses || [],
+//         createdAt: updated.createdAt,
+//         updatedAt: updated.updatedAt,
+//       }
+//     });
+//   } catch (error) {
+//     console.error('Lỗi khi cập nhật hồ sơ:', error);
+//     return res.status(500).json({ message: 'Lỗi máy chủ nội bộ' });
+//   }
+// };
 
 const addAddress = async (req, res) => {
   try {
@@ -143,7 +143,7 @@ const updateAddress = async (req, res) => {
   }
 };
 module.exports = {
-  getProfile,
-  updateProfile,
+  // getProfile,
+  // updateProfile,
   addAddress, updateAddress
 };
