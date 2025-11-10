@@ -1,4 +1,4 @@
-//foodController.js
+// foodController.js
 const Food = require("../model/food.model");
 const Category = require("../model/category.model");
 
@@ -32,7 +32,7 @@ const getFeaturedFoods = async (req, res) => {
 };
 
 // --- 2. GET /api/food ---
-// Đã thêm logic lọc linh hoạt theo tagsFilter
+// Giữ nguyên hàm listFoods
 const listFoods = async (req, res) => {
   try {
     const {
@@ -109,7 +109,7 @@ const listFoods = async (req, res) => {
 };
 
 // --- 3. GET /api/food/:idOrSlug ---
-// Giữ nguyên
+// 🎯 ĐÃ THÊM POPULATE 🎯
 const getFoodByIdOrSlug = async (req, res) => {
   try {
     const { idOrSlug } = req.params;
@@ -119,7 +119,10 @@ const getFoodByIdOrSlug = async (req, res) => {
 
     const query = isMongoId ? { _id: idOrSlug } : { slug: idOrSlug };
 
-    const item = await Food.findOne(query).lean();
+    // 💡 THAY ĐỔI: Thêm .populate() để lấy thông tin chi tiết của Category
+    const item = await Food.findOne(query)
+      .populate('categoryId') // Populate trường categoryId
+      .lean();
 
     if (!item) {
       return res.status(404).json({
@@ -127,6 +130,8 @@ const getFoodByIdOrSlug = async (req, res) => {
         message: "Food not found",
       });
     }
+
+    // 💡 LƯU Ý: Frontend sẽ cần truy cập item.categoryId.name
     return res.status(200).json({
       success: true,
       data: item,
