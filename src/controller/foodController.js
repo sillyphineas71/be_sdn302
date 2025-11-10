@@ -117,4 +117,14 @@ const updateFood = async (req, res) => {
   }
 };
 
-module.exports = { updateFood, createFood };
+const getFoods = async (req, res) => {
+  try {
+    // Lấy danh sách món còn hàng (inStock = true)
+    const foods = await Food.find({ inStock: true }).populate('categoryId', 'name slug');
+    res.status(200).json(foods);
+  } catch (error) {
+    res.status(500).json({ message: 'Lỗi khi lấy danh sách món ăn', error: error.message });
+  }
+};
+
+module.exports = { updateFood, createFood ,getFoods };

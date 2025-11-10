@@ -18,6 +18,9 @@ app.use("/api/auth", require("./src/routes/authRoutes"));
 app.use("/api/order", require("./src/routes/orderRoutes"));
 app.use("/api/users", require("./src/routes/userRoutes"));
 app.use("/api/food", require("./src/routes/foodRoutes"));
+app.use('/categories', require("./src/routes/categoryRoutes.js"));
+app.use("/api/blog", require("./src/routes/blogRoute.js"));
+app.use("/api/blog-category", require("./src/routes/blogCategoryRoutes.js"));
 
 // admin
 app.use("/api/admin/dashboard", require("./src/routes/adminDashboardRoutes.js"));
