@@ -29,11 +29,12 @@ app.get("/", async (req, res) => {
 app.use("/api/auth", require("./src/routes/authRoutes"));
 app.use("/api/order", require("./src/routes/orderRoutes"));
 app.use("/api/users", require("./src/routes/userRoutes"));
-app.use("/api/food", require("./src/routes/foodRoutes"));
+app.use("/api/admin/foods", require("./src/routes/foodRoutes"));
 app.use("/api/cart", require("./src/routes/cartRoutes"));
 app.use("/api/feedbacks", require("./src/routes/feedbackRoutes"));
 app.use("/api/blogs", require("./src/routes/blogRoutes"));
 app.use("/api/blog-categories", require("./src/routes/blogCategoryRoutes"));
+app.use("/api/admin/categories", require("./src/routes/categoryRoutes"));
 
 const PORT = process.env.PORT || 9999;
 app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));

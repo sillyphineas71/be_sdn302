@@ -59,6 +59,10 @@ module.exports.login = async (req, res) => {
       return res.status(400).json({ message: "Invalid email or password" });
     }
     const isMatch = await bcrypt.compare(password, user.passHash);
+    console.log("🔍 Input password:", password);
+    console.log("🔍 DB hash:", user.passHash);
+    console.log("🔍 Compare result:", await bcrypt.compare(password, user.passHash));
+
     if (!isMatch) {
       return res.status(400).json({ message: "Invalid email or password" });
     }
@@ -81,3 +85,17 @@ module.exports.login = async (req, res) => {
     return res.status(500).json({ message: err.message || "Login failed" });
   }
 };
+module.exports.me = async (req, res) => {
+  try {
+    const user = await User.findById(req.userId).populate("roleId");
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    res.json({
+      email: user.email,
+      role: user.roleId?.name,
+    });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+

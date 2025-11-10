@@ -1,5 +1,7 @@
-const router = require("express").Router();
-const authController = require("../controller/authController");
+const express = require("express");
+const router = express.Router();
+const authController  = require("../controller/authController");
+const { isAuth } = require("../middleware/auth");
 
 /**
  * @swagger
@@ -96,5 +98,9 @@ router.post("/register", authController.register);
  *         description: Server error
  */
 router.post("/login", authController.login);
+
+
+//  Thêm dòng này để test role
+router.get("/me", isAuth, authController.me);
 
 module.exports = router;

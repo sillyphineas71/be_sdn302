@@ -60,6 +60,22 @@ const createFood = async (req, res) => {
     });
   }
 };
+// Lấy thông tin 1 món ăn theo ID
+const getFoodById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const food = await Food.findById(id).populate("categoryId", "name");
+
+    if (!food) {
+      return res.status(404).json({ message: "Food not found" });
+    }
+
+    res.status(200).json(food);
+  } catch (error) {
+    console.error("Error fetching food by id:", error);
+    res.status(500).json({ message: "Failed to get food", error: error.message });
+  }
+};
 
 const updateFood = async (req, res) => {
   try {
@@ -117,4 +133,4 @@ const updateFood = async (req, res) => {
   }
 };
 
-module.exports = { updateFood, createFood };
+module.exports = { updateFood, createFood,getFoodById };
