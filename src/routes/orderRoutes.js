@@ -9,6 +9,9 @@ const { isAuth } = require("../middleware/auth");
  *   description: Order management
  */
 
+// Lấy danh sách đơn hàng theo userId (dành cho admin hoặc public API)
+router.get("/user/:userId", orderController.getOrdersByUser);
+
 /**
  * @swagger
  * /api/order/add:

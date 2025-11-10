@@ -13,9 +13,9 @@ function genOrderCode() {
   )}-${pad(d.getHours())}${pad(d.getMinutes())}${pad(d.getSeconds())}`;
 }
 
+// ===============================
 // POST /api/order/add
-// Create order directly from food items (legacy, bypass cart)
-// Body: { userId, items: [{ foodId, quantity }], shipping?, discount?, tax?, notes?, paymentMethodCode? }
+// ===============================
 module.exports.addOrder = async (req, res) => {
   try {
     const { userId, items, shipping, discount, tax, notes, paymentMethodCode } =
@@ -128,8 +128,9 @@ module.exports.addOrder = async (req, res) => {
   }
 };
 
+// ===============================
 // GET /api/order/:orderId
-// Get order details
+// ===============================
 module.exports.getOrder = async (req, res) => {
   try {
     const { orderId } = req.params;
@@ -193,8 +194,9 @@ module.exports.getOrder = async (req, res) => {
   }
 };
 
+// ===============================
 // GET /api/order/my-orders
-// Get all orders for authenticated user
+// ===============================
 module.exports.getUserOrders = async (req, res) => {
   try {
     const userId = req.userId; // From auth middleware
@@ -229,9 +231,9 @@ module.exports.getUserOrders = async (req, res) => {
   }
 };
 
+// ===============================
 // PUT /api/order/:orderId/status
-// Update order status
-// Body: { status }
+// ===============================
 module.exports.updateOrderStatus = async (req, res) => {
   try {
     const { orderId } = req.params;
@@ -281,5 +283,34 @@ module.exports.updateOrderStatus = async (req, res) => {
     return res
       .status(500)
       .json({ message: err.message || "Failed to update order status" });
+  }
+};
+
+// ===============================
+// GET /api/order/user/:userId
+// ===============================
+module.exports.getOrdersByUser = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const orders = await Order.find({ userId })
+      .populate({
+        path: "userId",
+        select: "fullName email",
+      })
+      .lean();
+
+    const orderIds = orders.map((o) => o._id);
+    const details = await OrderDetail.find({ orderId: { $in: orderIds } })
+      .populate("foodId", "name")
+      .lean();
+
+    const merged = orders.map((o) => ({
+      ...o,
+      items: details.filter((d) => String(d.orderId) === String(o._id)),
+    }));
+
+    res.json(merged);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
   }
 };

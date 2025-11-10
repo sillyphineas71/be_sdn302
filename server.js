@@ -1,16 +1,22 @@
 const express = require("express");
 const swaggerUi = require("swagger-ui-express");
 const swaggerSpec = require("./config/swagger");
-const connectDB = require("./config/db.js");
 const cors = require("cors");
+const connectDB = require("./config/db.js");
+
 const app = express();
 
+// Middleware
 app.use(express.json());
+app.use(cors());
+
+// Kết nối database
 connectDB();
 
 // Swagger documentation
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
-app.use(cors());
+
+// Default route
 app.get("/", async (req, res) => {
   try {
     res.send({ message: "Welcome to BE_SDN API. View docs at /api-docs" });
@@ -19,11 +25,15 @@ app.get("/", async (req, res) => {
   }
 });
 
+// API routes
 app.use("/api/auth", require("./src/routes/authRoutes"));
 app.use("/api/order", require("./src/routes/orderRoutes"));
 app.use("/api/users", require("./src/routes/userRoutes"));
 app.use("/api/food", require("./src/routes/foodRoutes"));
 app.use("/api/cart", require("./src/routes/cartRoutes"));
+app.use("/api/feedbacks", require("./src/routes/feedbackRoutes"));
+app.use("/api/blogs", require("./src/routes/blogRoutes"));
+app.use("/api/blog-categories", require("./src/routes/blogCategoryRoutes"));
 
 const PORT = process.env.PORT || 9999;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
