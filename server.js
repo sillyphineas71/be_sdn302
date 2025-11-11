@@ -33,6 +33,7 @@ app.use("/api/admin/foods", require("./src/routes/foodRoutes"));
 app.use("/api/cart", require("./src/routes/cartRoutes"));
 app.use("/api/feedbacks", require("./src/routes/feedbackRoutes"));
 app.use("/api/blogs", require("./src/routes/blogRoutes"));
+
 app.use("/api/blog-categories", require("./src/routes/blogCategoryRoutes"));
 app.use("/api/admin/categories", require("./src/routes/categoryRoutes"));
 app.use("/api/category", require("./src/routes/categoryRoutes"));

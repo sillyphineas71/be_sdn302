@@ -283,6 +283,21 @@ const updateFood = async (req, res) => {
   }
 };
 
+// DELETE /api/admin/foods/:id
+const deleteFood = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const deleted = await Food.findByIdAndDelete(id);
+    if (!deleted) {
+      return res.status(404).json({ message: "Food not found" });
+    }
+    return res.status(200).json({ message: "Food deleted" });
+  } catch (error) {
+    console.error("Error deleting food:", error);
+    return res.status(500).json({ message: "Failed to delete food" });
+  }
+};
+
 module.exports = {
   getFeaturedFoods,
   listFoods,
@@ -290,4 +305,5 @@ module.exports = {
   updateFood,
   getFoodById,
   createFood,
+  deleteFood,
 };

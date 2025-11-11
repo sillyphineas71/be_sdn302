@@ -132,7 +132,7 @@ router.post("/items", isAuth, cartController.addItem);
  *       404:
  *         description: Cart item not found
  */
-router.put("/items/:itemId", cartController.updateItem);
+router.put("/items/:itemId", isAuth, cartController.updateItem);
 
 /**
  * @swagger
@@ -162,7 +162,7 @@ router.put("/items/:itemId", cartController.updateItem);
  *       404:
  *         description: Cart item not found
  */
-router.delete("/items/:itemId", cartController.removeItem);
+router.delete("/items/:itemId", isAuth, cartController.removeItem);
 
 /**
  * @swagger

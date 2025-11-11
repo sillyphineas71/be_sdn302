@@ -85,7 +85,7 @@ router.get("/user/:userId", orderController.getOrdersByUser);
  *       404:
  *         description: Some food items not found
  */
-router.post("/add", orderController.addOrder);
+router.post("/add", isAuth, orderController.addOrder);
 
 /**
  * @swagger

@@ -18,8 +18,9 @@ function genOrderCode() {
 // ===============================
 module.exports.addOrder = async (req, res) => {
   try {
-    const { userId, items, shipping, discount, tax, notes, paymentMethodCode } =
+    const { items, shipping, discount, tax, notes, paymentMethodCode } =
       req.body || {};
+    const userId = req.userId; // enforce user from JWT
 
     if (!userId) {
       return res.status(400).json({ message: "userId is required" });
