@@ -16,6 +16,8 @@ router.get("/", async (req, res) => {
 router.get("/:id", foodController.getFoodById);
 
 // ✅ Thêm món ăn mới
+router.get("/featured", foodController.getFeaturedFoods);
+router.get("/:idOrSlug", foodController.getFoodByIdOrSlug);
 router.post("/add", foodController.createFood);
 
 // ✅ Cập nhật món ăn

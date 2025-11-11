@@ -35,6 +35,7 @@ app.use("/api/feedbacks", require("./src/routes/feedbackRoutes"));
 app.use("/api/blogs", require("./src/routes/blogRoutes"));
 app.use("/api/blog-categories", require("./src/routes/blogCategoryRoutes"));
 app.use("/api/admin/categories", require("./src/routes/categoryRoutes"));
+app.use("/api/category", require("./src/routes/categoryRoutes"));
 
 const PORT = process.env.PORT || 9999;
 app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
