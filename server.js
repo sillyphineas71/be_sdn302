@@ -3,17 +3,10 @@ const swaggerUi = require("swagger-ui-express");
 const swaggerSpec = require("./config/swagger");
 const cors = require("cors");
 const connectDB = require("./config/db.js");
-<<<<<<< HEAD
 
 const app = express();
 
 // Middleware
-=======
-const cors = require("cors");
-
-const app = express();
-app.use(cors());
->>>>>>> namnh
 app.use(express.json());
 app.use(cors());
 
@@ -44,12 +37,15 @@ app.use("/api/blog-categories", require("./src/routes/blogCategoryRoutes"));
 app.use("/api/admin/categories", require("./src/routes/categoryRoutes"));
 app.use("/api/category", require("./src/routes/categoryRoutes"));
 app.use("/api/food", require("./src/routes/foodRoutes"));
-app.use('/categories', require("./src/routes/categoryRoutes.js"));
+app.use("/categories", require("./src/routes/categoryRoutes.js"));
 app.use("/api/blog", require("./src/routes/blogRoute.js"));
 app.use("/api/blog-category", require("./src/routes/blogCategoryRoutes.js"));
 
 // admin
-app.use("/api/admin/dashboard", require("./src/routes/adminDashboardRoutes.js"));
+app.use(
+  "/api/admin/dashboard",
+  require("./src/routes/adminDashboardRoutes.js")
+);
 app.use("/api/admin/users", require("./src/routes/adminUserRoutes.js"));
 app.use("/api/admin/orders", require("./src/routes/adminOrderRoutes.js"));
 
